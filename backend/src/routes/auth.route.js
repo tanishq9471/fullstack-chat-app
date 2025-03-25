@@ -1,10 +1,8 @@
 import express from "express";
 import { checkAuth, login, logout, signup, updateProfile } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
+import passport from 'passport';
 
-
-
-const passport = require('passport');
 
 const router = express.Router();
 

@@ -1,5 +1,8 @@
-const passport = require('passport');
-const GoogleStrategy = require('passport-google-oauth20').Strategy;
+import passport from 'passport';
+import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
+import dotenv from 'dotenv';
+
+dotenv.config(); // Load environment variables
 
 passport.use(
   new GoogleStrategy(

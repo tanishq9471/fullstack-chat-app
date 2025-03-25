@@ -11,10 +11,10 @@ import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { app, server } from "./lib/socket.js";
 
-const session = require('express-session');
-const passport = require('passport');
-require('./auth/googleAuth'); // Ensure passport is initialized
+import session from 'express-session';
+import passport from 'passport';
 
+import './controller/googleAuth.js'; // Import Google auth setup
 
 
 dotenv.config();
