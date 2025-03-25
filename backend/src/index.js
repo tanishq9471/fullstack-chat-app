@@ -11,6 +11,12 @@ import authRoutes from "./routes/auth.route.js";
 import messageRoutes from "./routes/message.route.js";
 import { app, server } from "./lib/socket.js";
 
+const session = require('express-session');
+const passport = require('passport');
+require('./auth/googleAuth'); // Ensure passport is initialized
+
+
+
 dotenv.config();
 
 const PORT = process.env.PORT;
@@ -24,6 +30,13 @@ app.use(
     credentials: true,
   })
 );
+
+
+app.use(session({ secret: 'random_jatt', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 app.use("/api/auth", authRoutes);
 app.use("/api/messages", messageRoutes);

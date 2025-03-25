@@ -139,6 +139,15 @@ const SignUpPage = () => {
               </Link>
             </p>
           </div>
+          <div className="text-center">
+            <p className="text-base-content/60">
+              Login Using Google?{" "}
+              <Link to="/auth/google" className="link link-primary">
+                Sign in
+              </Link>
+            </p>
+          </div>
+          
         </div>
       </div>
 
