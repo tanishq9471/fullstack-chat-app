@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useAuthStore } from "../store/useAuthStore";
-import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User, Button } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import AuthImagePattern from "../components/AuthImagePattern";
@@ -147,7 +147,7 @@ const SignUpPage = () => {
             <p className="text-base-content/60">
               Login Using Google?{" "}
             </p>
-            <Button onClick={handleGoogleLogin}>
+            <Button onClick={handleGoogleLogin}    >
                 Sign in
             </Button>  
           </div>
