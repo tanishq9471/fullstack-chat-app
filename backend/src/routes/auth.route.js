@@ -14,11 +14,11 @@ router.put("/update-profile", protectRoute, updateProfile);
 
 router.get("/check", protectRoute, checkAuth);
 
-router.get('/google', passport.authenticate('google', { scope: ['email'] }));
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  passport.authenticate('google', { failureRedirect: '/', scope: ['profile', 'email'] }),
   (req, res) => {
     res.redirect('/'); // Redirect after successful login
   }
