@@ -147,7 +147,7 @@ const SignUpPage = () => {
             <p className="text-base-content/60">
               Login Using Google?{" "}
             </p>
-            <Button onClick={handleGoogleLogin} className="link link-primary">
+            <Button onClick={handleGoogleLogin}>
                 Sign in
             </Button>  
           </div>
