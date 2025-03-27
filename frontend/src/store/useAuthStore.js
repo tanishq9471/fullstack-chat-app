@@ -42,7 +42,7 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
-  googleSignUp: async () => {
+  googleSignUp: async (data) => {
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/google", data);
