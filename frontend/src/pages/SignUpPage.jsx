@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 
 import AuthImagePattern from "../components/AuthImagePattern";
 import toast from "react-hot-toast";
-import {Button} from "react-native";
 
 const SignUpPage = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -148,9 +147,9 @@ const SignUpPage = () => {
             <p className="text-base-content/60">
               Login Using Google?{" "}
             </p>
-            <Button onClick={handleGoogleLogin}    >
+            <button onClick={handleGoogleLogin}    >
                 Sign in
-            </Button>  
+            </button>  
           </div>
           
         </div>
