@@ -16,6 +16,10 @@ const SignUpPage = () => {
 
   const { signup, isSigningUp } = useAuthStore();
 
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:5000/auth/google"; // Backend URL
+  };
+
   const validateForm = () => {
     if (!formData.fullName.trim()) return toast.error("Full name is required");
     if (!formData.email.trim()) return toast.error("Email is required");
@@ -142,9 +146,9 @@ const SignUpPage = () => {
           <div className="text-center">
             <p className="text-base-content/60">
               Login Using Google?{" "}
-              <Link to="/google" className="link link-primary">
+              <Button onClick={handleGoogleLogin} className="link link-primary">
                 Sign in
-              </Link>
+              </Button>
             </p>
           </div>
           
