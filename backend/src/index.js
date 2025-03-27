@@ -14,7 +14,7 @@ import { app, server } from "./lib/socket.js";
 import session from 'express-session';
 import passport from 'passport';
 
-import './controller/googleAuth.js'; // Import Google auth setup
+import "./controllers/googleAuth.js"; // Import Google auth setup
 
 
 dotenv.config();
