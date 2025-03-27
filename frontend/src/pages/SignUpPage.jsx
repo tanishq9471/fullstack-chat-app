@@ -17,7 +17,7 @@ const SignUpPage = () => {
   const { signup, isSigningUp, googleSignUp } = useAuthStore();
 
   const handleGoogleLogin = () => {
-    googleSignUp();
+    googleSignUp(formData);
   };
 
   const validateForm = () => {
