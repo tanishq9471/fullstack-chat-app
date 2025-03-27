@@ -14,10 +14,10 @@ const SignUpPage = () => {
     password: "",
   });
 
-  const { signup, isSigningUp } = useAuthStore();
+  const { signup, isSigningUp, googleSignUp } = useAuthStore();
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google"; // Backend URL
+    googleSignUp();
   };
 
   const validateForm = () => {
