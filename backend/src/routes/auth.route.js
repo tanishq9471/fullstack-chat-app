@@ -21,7 +21,7 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/' }),
+  signup,
   (req, res) => {
     console.log(req, res);
     const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET, { expiresIn: '1h' });
