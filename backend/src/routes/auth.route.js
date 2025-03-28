@@ -3,6 +3,7 @@ import { checkAuth, login, logout, signup, updateProfile } from "../controllers/
 import { protectRoute } from "../middleware/auth.middleware.js";
 import passport from 'passport';
 import dotenv from 'dotenv';
+import jwt from "jsonwebtoken";
 
 dotenv.config(); // Load environment variables
 
