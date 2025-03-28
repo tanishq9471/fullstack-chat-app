@@ -15,10 +15,6 @@ passport.use(
     (accessToken, refreshToken, profile, done) => {
       // Store user details in DB or session
       
-      const {email, name, picture} = profile;
-      const password = "Sanskar@12";
-      const req = {body: {email,name, picture, password}};
-      signup(req);
       return done(null, profile);
     }
   )
