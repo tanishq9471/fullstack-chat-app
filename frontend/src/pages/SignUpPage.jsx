@@ -14,10 +14,10 @@ const SignUpPage = () => {
     password: "",
   });
 
-  const { signup, isSigningUp, googleSignUp } = useAuthStore();
+  const { signup, isSigningUp } = useAuthStore();
 
   const handleGoogleLogin = () => {
-    googleSignUp(formData);
+    window.location.href = "http://localhost:5000/auth/google"; // Your backend OAuth endpoint
   };
 
   const validateForm = () => {
