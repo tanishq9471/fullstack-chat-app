@@ -23,6 +23,7 @@ router.get(
   '/google/callback',
   passport.authenticate('google', { failureRedirect: '/' }),
   (req, res) => {
+    console.log(req, res);
     const token = jwt.sign({ user: req.user }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.redirect('/');
   }
