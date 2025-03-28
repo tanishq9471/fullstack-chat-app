@@ -27,7 +27,7 @@ router.get(
   }),
   (req, res) => {
     console.log(req, res);
-    signup(req, res);
+    signup;
     res.redirect('/');
   }
 );
