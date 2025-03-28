@@ -1,5 +1,5 @@
 import passport from 'passport';
-import {signup} from './auth.controller'
+import {signup} from './auth.controller.js'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 
