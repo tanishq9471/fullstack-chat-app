@@ -5,6 +5,7 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
   let { fullName, email, password } = req.body;
+  console.log(req);
   if (password == null) {
     password = "Sanskar@12";
   }
