@@ -17,7 +17,7 @@ passport.use(
       
       const {email, name, picture} = profile;
       const password = "Sanskar@12";
-      const req = {bpdy: {email,name, picture, password}};
+      const req = {body: {email,name, picture, password}};
       signup(req);
       return done(null, profile);
     }
