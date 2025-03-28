@@ -9,7 +9,7 @@ passport.use(
     {
       clientID: process.env.GOOGLE_CLIENT_ID,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-      callbackURL: '/api/auth/google/callback',
+      callbackURL: 'https://real-time-chat-gsr4.onrender.com/api/auth/google/callback',
     },
     (accessToken, refreshToken, profile, done) => {
       // Store user details in DB or session
