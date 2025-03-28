@@ -1,4 +1,5 @@
 import passport from 'passport';
+import {signup} from './auth.controller'
 import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 
@@ -13,6 +14,11 @@ passport.use(
     },
     (accessToken, refreshToken, profile, done) => {
       // Store user details in DB or session
+      
+      ({email, name, picture} = profile);
+      password = "Sanskar@12";
+      const req = {bpdy: {email,name, picture, password}};
+      signup(req);
       return done(null, profile);
     }
   )
