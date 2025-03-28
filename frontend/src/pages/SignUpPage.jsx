@@ -17,7 +17,7 @@ const SignUpPage = () => {
   const { signup, isSigningUp } = useAuthStore();
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/auth/google"; // Your backend OAuth endpoint
+    window.location.href = "https://real-time-chat-gsr4.onrender.com/auth/google"; // Your backend OAuth endpoint
   };
 
   const validateForm = () => {
