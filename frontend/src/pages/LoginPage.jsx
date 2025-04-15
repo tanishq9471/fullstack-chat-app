@@ -109,7 +109,7 @@ const LoginPage = () => {
           <div className="text-center mt-4">
             <div className="divider">OR</div>
             <button 
-              onClick={() => window.location.href = 'http://localhost:5000/api/auth/google'}
+              onClick={() => window.location.href = 'https://real-time-chat-gsr4.onrender.com/api/auth/google'}
               className="btn btn-outline w-full"
               type="button"
             >

@@ -18,7 +18,7 @@ const SignUpPage = () => {
 
   const handleGoogleLogin = () => {
     // Redirect to the backend Google auth route
-    window.location.href = 'http://localhost:5000/api/auth/google';
+    window.location.href = 'https://real-time-chat-gsr4.onrender.com/api/auth/google';
   };
 
   const validateForm = () => {
