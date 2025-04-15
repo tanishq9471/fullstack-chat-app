@@ -2,7 +2,7 @@ import User from "../models/user.model.js";
 import axios from 'axios';
 import Message from "../models/message.model.js";
 import { io } from "../lib/socket.js";
-import { response } from "express";
+import e, { response } from "express";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -123,7 +123,7 @@ const generateAIResponse = async (userMessage) => {
   //   "I've analyzed your question and here's what I found..."
   // ];
   
-  
+  try {
   let data = JSON.stringify({
     "model": "google/gemma-3-12b-it",
     "messages": [
@@ -151,18 +151,14 @@ const generateAIResponse = async (userMessage) => {
     data : data
   };
 
-  await axios.request(config)
-  .then((response) => {
-    console.log(response, "1111");
-    console.log(JSON.stringify(response.data.choices[0].message.content));
-    return JSON.stringify(response.data.choices[0].message.content);
-  })
-  .catch((error) => {
-    console.log(error);
-    return error;
-  });
-  
-  // Return a random response
-  
+  const response = await axios.request(config)
+
+  return response.data.choices[0].message.content;
+
+} catch (error) {
+  console.error(error);
+  return error.message;
+}
+
   
 };
