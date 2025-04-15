@@ -5,16 +5,22 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const googleAuth = async (req, res) => {
   try {
-    const { email, fullName, profilePic } = req.body;
+    const { email, fullName, profilePic, googleId } = req.body;
     
-    if (!email || !fullName) {
-      return res.status(400).json({ message: "Email and name are required" });
+    if (!email || !fullName || !googleId) {
+      return res.status(400).json({ message: "Email, name, and Google ID are required" });
     }
 
-    // Check if user already exists
-    let user = await User.findOne({ email });
+    // Check if user already exists by email or googleId
+    let user = await User.findOne({ $or: [{ email }, { googleId }] });
     
     if (user) {
+      // If user exists but doesn't have googleId (registered via email), update the googleId
+      if (!user.googleId) {
+        user.googleId = googleId;
+        await user.save();
+      }
+      
       // User exists, log them in
       generateToken(user._id, res);
       
@@ -30,6 +36,7 @@ export const googleAuth = async (req, res) => {
     const newUser = new User({
       fullName,
       email,
+      googleId,
       profilePic: profilePic || "",
       // No password for Google auth users
     });

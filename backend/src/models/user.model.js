@@ -13,8 +13,15 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
+      required: function() {
+        // Password is required only if the user is not created via Google auth
+        return this.googleId ? false : true;
+      },
       minlength: 6,
+    },
+    googleId: {
+      type: String,
+      default: null,
     },
     profilePic: {
       type: String,

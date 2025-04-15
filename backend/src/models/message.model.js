@@ -10,13 +10,20 @@ const messageSchema = new mongoose.Schema(
     receiverId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+    },
+    groupId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "GroupChat",
     },
     text: {
       type: String,
     },
     image: {
       type: String,
+    },
+    isGroupMessage: {
+      type: Boolean,
+      default: false,
     },
   },
   { timestamps: true }
