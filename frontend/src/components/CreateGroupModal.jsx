@@ -43,24 +43,40 @@ const CreateGroupModal = ({ isOpen, onClose }) => {
     e.preventDefault();
     
     if (!groupName.trim()) {
-      return alert("Group name is required");
+      toast.error("Group name is required");
+      return;
     }
     
     if (selectedMembers.length === 0) {
-      return alert("Please select at least one member");
+      toast.error("Please select at least one member");
+      return;
     }
     
-    const groupData = {
-      name: groupName,
-      members: selectedMembers,
-      description,
-      groupImage,
-    };
-    
-    const newGroup = await createGroupChat(groupData);
-    if (newGroup) {
-      resetForm();
-      onClose();
+    try {
+      console.log("Creating group with members:", selectedMembers);
+      
+      const groupData = {
+        name: groupName,
+        members: selectedMembers,
+        description,
+        groupImage,
+      };
+      
+      console.log("Submitting group data:", groupData);
+      
+      const newGroup = await createGroupChat(groupData);
+      console.log("Response from createGroupChat:", newGroup);
+      
+      if (newGroup) {
+        toast.success("Group created successfully!");
+        resetForm();
+        onClose();
+      } else {
+        toast.error("Failed to create group. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error creating group:", error);
+      toast.error("An error occurred while creating the group: " + (error.message || "Unknown error"));
     }
   };
 

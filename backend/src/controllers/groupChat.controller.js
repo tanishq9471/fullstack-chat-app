@@ -7,25 +7,39 @@ import { io, getReceiverSocketId } from "../lib/socket.js";
 // Create a new group chat
 export const createGroupChat = async (req, res) => {
   try {
+    console.log("Creating group chat with request body:", req.body);
     const { name, members, description, groupImage } = req.body;
     const admin = req.user._id;
+    
+    console.log("Admin ID:", admin);
+    console.log("Members:", members);
 
     if (!name || !members || members.length < 1) {
+      console.log("Missing required fields");
       return res.status(400).json({ message: "Please provide all required fields" });
     }
 
     // Add admin to members if not already included
     if (!members.includes(admin.toString())) {
+      console.log("Adding admin to members");
       members.push(admin.toString());
     }
 
     let imageUrl = "";
     if (groupImage) {
-      // Upload base64 image to cloudinary
-      const uploadResponse = await cloudinary.uploader.upload(groupImage);
-      imageUrl = uploadResponse.secure_url;
+      console.log("Uploading group image to cloudinary");
+      try {
+        // Upload base64 image to cloudinary
+        const uploadResponse = await cloudinary.uploader.upload(groupImage);
+        imageUrl = uploadResponse.secure_url;
+        console.log("Image uploaded successfully:", imageUrl);
+      } catch (cloudinaryError) {
+        console.error("Error uploading image to cloudinary:", cloudinaryError);
+        // Continue without image if upload fails
+      }
     }
 
+    console.log("Creating new group chat with name:", name);
     const newGroupChat = new GroupChat({
       name,
       admin,
@@ -34,16 +48,22 @@ export const createGroupChat = async (req, res) => {
       groupImage: imageUrl,
     });
 
+    console.log("Saving group chat to database");
     await newGroupChat.save();
+    console.log("Group chat saved with ID:", newGroupChat._id);
 
     // Populate members info
+    console.log("Populating members info");
     const populatedGroupChat = await GroupChat.findById(newGroupChat._id)
       .populate("members", "fullName email profilePic")
       .populate("admin", "fullName email profilePic");
 
+    console.log("Notifying members about new group");
     // Notify all members about the new group
     members.forEach((memberId) => {
+      console.log("Notifying member:", memberId);
       const socketId = getReceiverSocketId(memberId);
+      console.log("Socket ID for member:", socketId);
       if (socketId) {
         io.to(socketId).emit("newGroupChat", populatedGroupChat);
       }
@@ -51,8 +71,10 @@ export const createGroupChat = async (req, res) => {
 
     res.status(201).json(populatedGroupChat);
   } catch (error) {
-    console.log("Error in createGroupChat controller: ", error.message);
-    res.status(500).json({ message: "Internal server error" });
+    console.log("Error in createGroupChat controller: ", error);
+    console.log("Error message: ", error.message);
+    console.log("Error stack: ", error.stack);
+    res.status(500).json({ message: "Internal server error: " + error.message });
   }
 };
 

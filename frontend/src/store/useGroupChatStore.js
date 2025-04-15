@@ -40,12 +40,29 @@ export const useGroupChatStore = create((set, get) => ({
   createGroupChat: async (groupData) => {
     set({ isCreatingGroup: true });
     try {
+      console.log("Creating group chat with data:", groupData);
+      
+      // Make sure members is an array of strings
+      if (groupData.members && Array.isArray(groupData.members)) {
+        groupData.members = groupData.members.map(id => id.toString());
+      }
+      
+      console.log("Sending request to create group chat");
       const res = await axiosInstance.post("/groups/create", groupData);
+      console.log("Response from server:", res.data);
+      
+      // Update the state with the new group chat
       set({ groupChats: [res.data, ...get().groupChats] });
       toast.success("Group chat created successfully");
       return res.data;
     } catch (error) {
-      toast.error(error.response?.data?.message || "Error creating group chat");
+      console.error("Error creating group chat:", error);
+      console.error("Error response:", error.response);
+      
+      const errorMessage = error.response?.data?.message || "Error creating group chat";
+      console.error("Error message:", errorMessage);
+      
+      toast.error(errorMessage);
       return null;
     } finally {
       set({ isCreatingGroup: false });
