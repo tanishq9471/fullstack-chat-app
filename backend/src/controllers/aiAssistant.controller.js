@@ -79,7 +79,7 @@ export const sendMessageToAIAssistant = async (req, res) => {
     
     // Generate AI response
     const aiResponse = await generateAIResponse(text);
-    
+    console.log("response",aiResponse);
     // Save AI response
     const aiMessage = new Message({
       senderId: aiAssistant._id,
@@ -153,7 +153,8 @@ const generateAIResponse = async (userMessage) => {
 
   await axios.request(config)
   .then((response) => {
-    console.log(JSON.stringify(response.data));
+    console.log(response, "1111");
+    console.log(JSON.stringify(response.data.choices[0].message.content));
     return response.data.choices[0].message.content;
   })
   .catch((error) => {
