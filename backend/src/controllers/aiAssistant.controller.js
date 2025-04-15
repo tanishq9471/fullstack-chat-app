@@ -155,7 +155,7 @@ const generateAIResponse = async (userMessage) => {
   .then((response) => {
     console.log(response, "1111");
     console.log(JSON.stringify(response.data.choices[0].message.content));
-    return response.data.choices[0].message.content;
+    return JSON.stringify(response.data.choices[0].message.content);
   })
   .catch((error) => {
     console.log(error);
