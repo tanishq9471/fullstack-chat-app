@@ -6,6 +6,7 @@ import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
 import { formatMessageTime } from "../lib/utils";
+import ReactMarkdown from 'react-markdown'
 
 const ChatContainer = () => {
   const {
@@ -79,7 +80,7 @@ const ChatContainer = () => {
                   className="sm:max-w-[200px] rounded-md mb-2"
                 />
               )}
-              {message.text && <p>{message.text}</p>}
+              {message.text && <ReactMarkdown>{message.text}</ReactMarkdown>}
             </div>
           </div>
         ))}
