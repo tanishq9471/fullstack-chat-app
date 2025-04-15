@@ -3,6 +3,53 @@ import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
 
+export const googleAuth = async (req, res) => {
+  try {
+    const { email, fullName, profilePic } = req.body;
+    
+    if (!email || !fullName) {
+      return res.status(400).json({ message: "Email and name are required" });
+    }
+
+    // Check if user already exists
+    let user = await User.findOne({ email });
+    
+    if (user) {
+      // User exists, log them in
+      generateToken(user._id, res);
+      
+      return res.status(200).json({
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        profilePic: user.profilePic,
+      });
+    }
+    
+    // Create new user if they don't exist
+    const newUser = new User({
+      fullName,
+      email,
+      profilePic: profilePic || "",
+      // No password for Google auth users
+    });
+    
+    await newUser.save();
+    generateToken(newUser._id, res);
+    
+    res.status(201).json({
+      _id: newUser._id,
+      fullName: newUser.fullName,
+      email: newUser.email,
+      profilePic: newUser.profilePic,
+    });
+    
+  } catch (error) {
+    console.log("Error in googleAuth controller", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
   try {

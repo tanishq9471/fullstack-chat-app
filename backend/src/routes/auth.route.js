@@ -1,5 +1,5 @@
 import express from "express";
-import { checkAuth, login, logout, signup, updateProfile } from "../controllers/auth.controller.js";
+import { checkAuth, googleAuth, login, logout, signup, updateProfile } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import passport from 'passport';
 
@@ -9,6 +9,7 @@ const router = express.Router();
 router.post("/signup", signup);
 router.post("/login", login);
 router.post("/logout", logout);
+router.post("/google", googleAuth);
 
 router.put("/update-profile", protectRoute, updateProfile);
 
@@ -25,8 +26,12 @@ router.get(
 );
 
 router.get('/logout', (req, res) => {
-  req.logout();
-  res.redirect('/');
+  req.logout((err) => {
+    if (err) {
+      return res.status(500).json({ message: "Error logging out" });
+    }
+    res.redirect('/');
+  });
 });
 
 

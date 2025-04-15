@@ -48,7 +48,6 @@ export const useAuthStore = create((set, get) => ({
       const res = await axiosInstance.post("/auth/google", data);
       set({ authUser: res.data });
       toast.success("Logged in successfully");
-      console.log("Apne", data, res);
       get().connectSocket();
     } catch (error) {
       toast.error(error.response.data.message);
@@ -115,6 +114,10 @@ export const useAuthStore = create((set, get) => ({
     });
   },
   disconnectSocket: () => {
-    if (get().socket?.connected) get().socket.disconnect();
+    const socket = get().socket;
+    if (socket) {
+      if (socket.connected) socket.disconnect();
+      set({ socket: null, onlineUsers: [] });
+    }
   },
 }));
