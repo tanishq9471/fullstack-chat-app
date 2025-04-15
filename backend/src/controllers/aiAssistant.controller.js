@@ -131,8 +131,8 @@ const generateAIResponse = async (userMessage) => {
         "role": "user",
         "content": [
           {
-            "type": userMessage,
-            "text": "What is in the picture?"
+            "type": "text",
+            "text": userMessage
           }        
         ]
       }
