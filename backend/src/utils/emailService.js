@@ -3,14 +3,48 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-// Create a transporter object using SMTP transport
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD
+// Check if email configuration is valid
+const isEmailConfigValid = () => {
+  const { EMAIL_USER, EMAIL_PASSWORD, EMAIL_SERVICE, SEND_EMAIL_NOTIFICATIONS } = process.env;
+  
+  if (SEND_EMAIL_NOTIFICATIONS !== 'true') {
+    console.log('Email notifications are disabled in .env configuration');
+    return false;
   }
-});
+  
+  if (!EMAIL_USER || EMAIL_USER === 'your.email@gmail.com') {
+    console.error('Invalid EMAIL_USER in .env file. Please set a valid email address.');
+    return false;
+  }
+  
+  if (!EMAIL_PASSWORD || EMAIL_PASSWORD === 'your-app-password') {
+    console.error('Invalid EMAIL_PASSWORD in .env file. Please set a valid password or app password.');
+    return false;
+  }
+  
+  return true;
+};
+
+// Create a transporter object using SMTP transport
+let transporter = null;
+
+try {
+  if (isEmailConfigValid()) {
+    transporter = nodemailer.createTransport({
+      service: process.env.EMAIL_SERVICE || 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD
+      }
+    });
+    
+    console.log(`Email service initialized with ${process.env.EMAIL_SERVICE} for ${process.env.EMAIL_USER}`);
+  } else {
+    console.log('Email service not initialized due to invalid configuration');
+  }
+} catch (error) {
+  console.error('Failed to initialize email transporter:', error);
+}
 
 /**
  * Send login notification email
@@ -20,6 +54,13 @@ const transporter = nodemailer.createTransport({
  */
 export const sendLoginNotification = async (to, name, loginInfo) => {
   try {
+    // Check if transporter is initialized
+    if (!transporter) {
+      console.log('Email transporter not initialized. Login notification email not sent.');
+      return false;
+    }
+    
+    console.log(`Preparing to send login notification email to ${to}`);
     const { ip, device, browser, time } = loginInfo;
     
     const mailOptions = {
@@ -50,11 +91,16 @@ export const sendLoginNotification = async (to, name, loginInfo) => {
       `
     };
 
+    console.log('Sending login notification email...');
     const info = await transporter.sendMail(mailOptions);
-    console.log('Login notification email sent:', info.messageId);
+    console.log('Login notification email sent successfully:', info.messageId);
     return true;
   } catch (error) {
     console.error('Error sending login notification email:', error);
+    console.error('Error details:', error.message);
+    if (error.code) {
+      console.error('Error code:', error.code);
+    }
     return false;
   }
 };
@@ -67,6 +113,13 @@ export const sendLoginNotification = async (to, name, loginInfo) => {
  */
 export const sendSignupConfirmation = async (to, name, signupInfo) => {
   try {
+    // Check if transporter is initialized
+    if (!transporter) {
+      console.log('Email transporter not initialized. Signup confirmation email not sent.');
+      return false;
+    }
+    
+    console.log(`Preparing to send signup confirmation email to ${to}`);
     const { ip, device, browser, time } = signupInfo;
     
     const mailOptions = {
@@ -95,11 +148,16 @@ export const sendSignupConfirmation = async (to, name, signupInfo) => {
       `
     };
 
+    console.log('Sending signup confirmation email...');
     const info = await transporter.sendMail(mailOptions);
-    console.log('Signup confirmation email sent:', info.messageId);
+    console.log('Signup confirmation email sent successfully:', info.messageId);
     return true;
   } catch (error) {
     console.error('Error sending signup confirmation email:', error);
+    console.error('Error details:', error.message);
+    if (error.code) {
+      console.error('Error code:', error.code);
+    }
     return false;
   }
 };

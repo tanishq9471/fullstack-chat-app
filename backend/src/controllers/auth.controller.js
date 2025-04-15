@@ -31,26 +31,45 @@ export const googleAuth = async (req, res) => {
       generateToken(user._id, res);
       
       // Send login notification email if enabled
+      console.log('Checking if email notifications are enabled for Google login:', process.env.SEND_EMAIL_NOTIFICATIONS);
       if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
         try {
-          const userAgent = req.headers['user-agent'];
+          console.log('Preparing Google login notification email data');
+          const userAgent = req.headers['user-agent'] || 'Unknown User Agent';
+          console.log('User Agent:', userAgent);
+          
           const { device, browser } = getDeviceInfo(userAgent);
+          console.log('Device Info:', { device, browser });
+          
           const ip = getClientIp(req);
+          console.log('IP Address:', ip);
+          
           const time = getCurrentTime();
+          console.log('Google Login Time:', time);
 
           // Send login notification asynchronously (don't wait for it)
+          console.log(`Attempting to send Google login notification email to ${user.email}`);
           sendLoginNotification(user.email, user.fullName, {
             ip,
             device,
             browser,
             time
+          }).then(success => {
+            if (success) {
+              console.log(`Google login notification email sent successfully to ${user.email}`);
+            } else {
+              console.log(`Failed to send Google login notification email to ${user.email}`);
+            }
           }).catch(err => console.error('Failed to send Google login email:', err));
           
           console.log(`Google login notification email queued for ${user.email}`);
         } catch (emailError) {
           // Don't fail the login if email sending fails
           console.error('Error preparing Google login notification email:', emailError);
+          console.error('Error details:', emailError.message);
         }
+      } else {
+        console.log('Email notifications are disabled. No Google login email sent.');
       }
       
       return res.status(200).json({
@@ -75,26 +94,45 @@ export const googleAuth = async (req, res) => {
     isNewUser = true;
     
     // Send signup confirmation email if enabled
+    console.log('Checking if email notifications are enabled for Google signup:', process.env.SEND_EMAIL_NOTIFICATIONS);
     if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
       try {
-        const userAgent = req.headers['user-agent'];
+        console.log('Preparing Google signup confirmation email data');
+        const userAgent = req.headers['user-agent'] || 'Unknown User Agent';
+        console.log('User Agent:', userAgent);
+        
         const { device, browser } = getDeviceInfo(userAgent);
+        console.log('Device Info:', { device, browser });
+        
         const ip = getClientIp(req);
+        console.log('IP Address:', ip);
+        
         const time = getCurrentTime();
+        console.log('Google Signup Time:', time);
 
         // Send signup confirmation asynchronously (don't wait for it)
+        console.log(`Attempting to send Google signup confirmation email to ${newUser.email}`);
         sendSignupConfirmation(newUser.email, newUser.fullName, {
           ip,
           device,
           browser,
           time
+        }).then(success => {
+          if (success) {
+            console.log(`Google signup confirmation email sent successfully to ${newUser.email}`);
+          } else {
+            console.log(`Failed to send Google signup confirmation email to ${newUser.email}`);
+          }
         }).catch(err => console.error('Failed to send Google signup email:', err));
         
         console.log(`Google signup confirmation email queued for ${newUser.email}`);
       } catch (emailError) {
         // Don't fail the signup if email sending fails
         console.error('Error preparing Google signup confirmation email:', emailError);
+        console.error('Error details:', emailError.message);
       }
+    } else {
+      console.log('Email notifications are disabled. No Google signup email sent.');
     }
     
     res.status(201).json({
@@ -140,26 +178,45 @@ export const signup = async (req, res) => {
       await newUser.save();
 
       // Send signup confirmation email if enabled
+      console.log('Checking if email notifications are enabled for signup:', process.env.SEND_EMAIL_NOTIFICATIONS);
       if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
         try {
-          const userAgent = req.headers['user-agent'];
+          console.log('Preparing signup confirmation email data');
+          const userAgent = req.headers['user-agent'] || 'Unknown User Agent';
+          console.log('User Agent:', userAgent);
+          
           const { device, browser } = getDeviceInfo(userAgent);
+          console.log('Device Info:', { device, browser });
+          
           const ip = getClientIp(req);
+          console.log('IP Address:', ip);
+          
           const time = getCurrentTime();
+          console.log('Signup Time:', time);
 
           // Send signup confirmation asynchronously (don't wait for it)
+          console.log(`Attempting to send signup confirmation email to ${newUser.email}`);
           sendSignupConfirmation(newUser.email, newUser.fullName, {
             ip,
             device,
             browser,
             time
+          }).then(success => {
+            if (success) {
+              console.log(`Signup confirmation email sent successfully to ${newUser.email}`);
+            } else {
+              console.log(`Failed to send signup confirmation email to ${newUser.email}`);
+            }
           }).catch(err => console.error('Failed to send signup email:', err));
           
           console.log(`Signup confirmation email queued for ${newUser.email}`);
         } catch (emailError) {
           // Don't fail the signup if email sending fails
           console.error('Error preparing signup confirmation email:', emailError);
+          console.error('Error details:', emailError.message);
         }
+      } else {
+        console.log('Email notifications are disabled. No signup email sent.');
       }
 
       res.status(201).json({
@@ -194,26 +251,45 @@ export const login = async (req, res) => {
     generateToken(user._id, res);
 
     // Send login notification email if enabled
+    console.log('Checking if email notifications are enabled:', process.env.SEND_EMAIL_NOTIFICATIONS);
     if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
       try {
-        const userAgent = req.headers['user-agent'];
+        console.log('Preparing login notification email data');
+        const userAgent = req.headers['user-agent'] || 'Unknown User Agent';
+        console.log('User Agent:', userAgent);
+        
         const { device, browser } = getDeviceInfo(userAgent);
+        console.log('Device Info:', { device, browser });
+        
         const ip = getClientIp(req);
+        console.log('IP Address:', ip);
+        
         const time = getCurrentTime();
+        console.log('Login Time:', time);
 
         // Send login notification asynchronously (don't wait for it)
+        console.log(`Attempting to send login notification email to ${user.email}`);
         sendLoginNotification(user.email, user.fullName, {
           ip,
           device,
           browser,
           time
+        }).then(success => {
+          if (success) {
+            console.log(`Login notification email sent successfully to ${user.email}`);
+          } else {
+            console.log(`Failed to send login notification email to ${user.email}`);
+          }
         }).catch(err => console.error('Failed to send login email:', err));
         
         console.log(`Login notification email queued for ${user.email}`);
       } catch (emailError) {
         // Don't fail the login if email sending fails
         console.error('Error preparing login notification email:', emailError);
+        console.error('Error details:', emailError.message);
       }
+    } else {
+      console.log('Email notifications are disabled. No login email sent.');
     }
 
     res.status(200).json({
