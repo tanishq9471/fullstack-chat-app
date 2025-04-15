@@ -137,7 +137,7 @@ const generateAIResponse = async (userMessage) => {
         ]
       }
     ],
-    "max_tokens": 32768
+    "max_tokens": 14208
   });
 
   let config = {
