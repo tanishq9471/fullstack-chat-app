@@ -15,6 +15,7 @@ const CreateGroupModal = ({ isOpen, onClose }) => {
   const { users, getUsers, isUsersLoading } = useChatStore();
 
   useEffect(() => {
+    console.log(isOpen, "111");
     if (isOpen) {
       getUsers();
     }
