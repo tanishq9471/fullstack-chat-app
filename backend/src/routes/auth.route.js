@@ -2,6 +2,7 @@ import express from "express";
 import { checkAuth, googleAuth, login, logout, signup, updateProfile } from "../controllers/auth.controller.js";
 import { protectRoute } from "../middleware/auth.middleware.js";
 import passport from 'passport';
+import { generateToken } from "../lib/utils.js";
 
 
 const router = express.Router();
@@ -19,9 +20,15 @@ router.get('/google', passport.authenticate('google', { scope: ['profile', 'emai
 
 router.get(
   '/google/callback',
-  passport.authenticate('google', { failureRedirect: '/', scope: ['profile', 'email'] }),
+  passport.authenticate('google', { failureRedirect: '/login' }),
   (req, res) => {
-    res.redirect('/'); // Redirect after successful login
+    // Generate JWT token for the authenticated user
+    generateToken(req.user._id, res);
+    
+    // Redirect to the frontend with success
+    res.redirect(process.env.NODE_ENV === 'production' 
+      ? '/'
+      : 'http://localhost:5173/');
   }
 );
 

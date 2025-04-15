@@ -17,7 +17,8 @@ const SignUpPage = () => {
   const { signup, isSigningUp, googleSignUp } = useAuthStore();
 
   const handleGoogleLogin = () => {
-    googleSignUp(formData);
+    // Redirect to the backend Google auth route
+    window.location.href = 'http://localhost:5000/api/auth/google';
   };
 
   const validateForm = () => {
@@ -143,12 +144,15 @@ const SignUpPage = () => {
               </Link>
             </p>
           </div>
-          <div className="text-center">
-            <p className="text-base-content/60">
-              Login Using Google?{" "}
-            </p>
-            <button onClick={handleGoogleLogin}    >
-                Sign in
+          <div className="text-center mt-4">
+            <div className="divider">OR</div>
+            <button 
+              onClick={handleGoogleLogin}
+              className="btn btn-outline w-full"
+              type="button"
+            >
+              <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="w-5 h-5 mr-2" />
+              Continue with Google
             </button>  
           </div>
           

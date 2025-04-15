@@ -105,6 +105,18 @@ const LoginPage = () => {
               </Link>
             </p>
           </div>
+          
+          <div className="text-center mt-4">
+            <div className="divider">OR</div>
+            <button 
+              onClick={() => window.location.href = 'http://localhost:5000/api/auth/google'}
+              className="btn btn-outline w-full"
+              type="button"
+            >
+              <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google" className="w-5 h-5 mr-2" />
+              Continue with Google
+            </button>  
+          </div>
         </div>
       </div>
 
