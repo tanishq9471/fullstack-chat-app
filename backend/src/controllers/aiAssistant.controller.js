@@ -1,4 +1,5 @@
 import User from "../models/user.model.js";
+import axios from 'axios';
 import Message from "../models/message.model.js";
 import { io } from "../lib/socket.js";
 import { response } from "express";
@@ -122,7 +123,7 @@ const generateAIResponse = async (userMessage) => {
   //   "I've analyzed your question and here's what I found..."
   // ];
   
-  const axios = require('axios');
+  
   let data = JSON.stringify({
     "model": "google/gemma-3-12b-it",
     "messages": [
