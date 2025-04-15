@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useGroupChatStore } from "../store/useGroupChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { Loader, Users, Plus } from "lucide-react";
-import FixedCreateGroupModal from "./FixedCreateGroupModal";
+import SimpleGroupModal from "./SimpleGroupModal";
 
 const GroupChatList = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -112,7 +112,7 @@ const GroupChatList = () => {
         </div>
       )}
 
-      <FixedCreateGroupModal
+      <SimpleGroupModal
         isOpen={isCreateModalOpen}
         onClose={() => {
           console.log("Closing create group modal");

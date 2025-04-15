@@ -40,29 +40,61 @@ export const useGroupChatStore = create((set, get) => ({
   createGroupChat: async (groupData) => {
     set({ isCreatingGroup: true });
     try {
-      console.log("Creating group chat with data:", groupData);
+      console.log("Creating group chat with data:", {
+        ...groupData,
+        groupImage: groupData.groupImage ? "Image data present (not shown)" : null
+      });
       
       // Make sure members is an array of strings
       if (groupData.members && Array.isArray(groupData.members)) {
         groupData.members = groupData.members.map(id => id.toString());
       }
       
+      console.log("Members after conversion:", groupData.members);
       console.log("Sending request to create group chat");
-      const res = await axiosInstance.post("/groups/create", groupData);
-      console.log("Response from server:", res.data);
       
-      // Update the state with the new group chat
-      set({ groupChats: [res.data, ...get().groupChats] });
-      toast.success("Group chat created successfully");
-      return res.data;
+      // Add a timeout to ensure the request doesn't hang
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      try {
+        const res = await axiosInstance.post("/groups/create", groupData, {
+          signal: controller.signal,
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        console.log("Response from server:", res.data);
+        
+        // Update the state with the new group chat
+        set({ groupChats: [res.data, ...get().groupChats] });
+        toast.success("Group chat created successfully");
+        return res.data;
+      } catch (axiosError) {
+        clearTimeout(timeoutId);
+        throw axiosError;
+      }
     } catch (error) {
       console.error("Error creating group chat:", error);
-      console.error("Error response:", error.response);
       
-      const errorMessage = error.response?.data?.message || "Error creating group chat";
-      console.error("Error message:", errorMessage);
+      if (error.name === 'AbortError') {
+        console.error("Request timed out");
+        toast.error("Request timed out. Please try again.");
+      } else if (error.response) {
+        console.error("Error response:", error.response);
+        const errorMessage = error.response?.data?.message || "Error creating group chat";
+        console.error("Error message:", errorMessage);
+        toast.error(errorMessage);
+      } else if (error.request) {
+        console.error("No response received:", error.request);
+        toast.error("No response from server. Please check your connection.");
+      } else {
+        console.error("Error message:", error.message);
+        toast.error("Error creating group: " + error.message);
+      }
       
-      toast.error(errorMessage);
       return null;
     } finally {
       set({ isCreatingGroup: false });

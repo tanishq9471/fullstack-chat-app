@@ -7,24 +7,51 @@ import { io, getReceiverSocketId } from "../lib/socket.js";
 // Create a new group chat
 export const createGroupChat = async (req, res) => {
   try {
-    console.log("Creating group chat with request body:", req.body);
+    console.log("Creating group chat with request body:", {
+      ...req.body,
+      groupImage: req.body.groupImage ? "Image data present (not shown)" : null
+    });
+    
     const { name, members, description, groupImage } = req.body;
     const admin = req.user._id;
     
     console.log("Admin ID:", admin);
-    console.log("Members:", members);
+    console.log("Members received:", members);
 
-    if (!name || !members || members.length < 1) {
-      console.log("Missing required fields");
-      return res.status(400).json({ message: "Please provide all required fields" });
+    // Validate required fields
+    if (!name) {
+      console.log("Missing group name");
+      return res.status(400).json({ message: "Group name is required" });
+    }
+    
+    if (!members || !Array.isArray(members) || members.length < 1) {
+      console.log("Invalid or missing members array");
+      return res.status(400).json({ message: "Please select at least one member" });
+    }
+
+    // Ensure all member IDs are valid
+    try {
+      for (const memberId of members) {
+        if (!memberId || typeof memberId !== 'string') {
+          console.log("Invalid member ID:", memberId);
+          return res.status(400).json({ message: "Invalid member ID format" });
+        }
+      }
+    } catch (validationError) {
+      console.error("Error validating member IDs:", validationError);
+      return res.status(400).json({ message: "Invalid member data" });
     }
 
     // Add admin to members if not already included
-    if (!members.includes(admin.toString())) {
+    const membersList = [...members];
+    if (!membersList.includes(admin.toString())) {
       console.log("Adding admin to members");
-      members.push(admin.toString());
+      membersList.push(admin.toString());
     }
+    
+    console.log("Final members list:", membersList);
 
+    // Handle group image upload
     let imageUrl = "";
     if (groupImage) {
       console.log("Uploading group image to cloudinary");
@@ -35,46 +62,72 @@ export const createGroupChat = async (req, res) => {
         console.log("Image uploaded successfully:", imageUrl);
       } catch (cloudinaryError) {
         console.error("Error uploading image to cloudinary:", cloudinaryError);
+        console.error("Cloudinary error details:", cloudinaryError.message);
         // Continue without image if upload fails
       }
     }
 
+    // Create the group chat document
     console.log("Creating new group chat with name:", name);
     const newGroupChat = new GroupChat({
       name,
       admin,
-      members,
+      members: membersList,
       description: description || "",
       groupImage: imageUrl,
     });
 
+    // Save to database
     console.log("Saving group chat to database");
-    await newGroupChat.save();
-    console.log("Group chat saved with ID:", newGroupChat._id);
+    try {
+      await newGroupChat.save();
+      console.log("Group chat saved with ID:", newGroupChat._id);
+    } catch (saveError) {
+      console.error("Error saving group chat:", saveError);
+      return res.status(500).json({ message: "Failed to save group chat: " + saveError.message });
+    }
 
     // Populate members info
     console.log("Populating members info");
-    const populatedGroupChat = await GroupChat.findById(newGroupChat._id)
-      .populate("members", "fullName email profilePic")
-      .populate("admin", "fullName email profilePic");
-
-    console.log("Notifying members about new group");
-    // Notify all members about the new group
-    members.forEach((memberId) => {
-      console.log("Notifying member:", memberId);
-      const socketId = getReceiverSocketId(memberId);
-      console.log("Socket ID for member:", socketId);
-      if (socketId) {
-        io.to(socketId).emit("newGroupChat", populatedGroupChat);
+    let populatedGroupChat;
+    try {
+      populatedGroupChat = await GroupChat.findById(newGroupChat._id)
+        .populate("members", "fullName email profilePic")
+        .populate("admin", "fullName email profilePic");
+        
+      if (!populatedGroupChat) {
+        console.error("Failed to retrieve populated group chat");
+        return res.status(500).json({ message: "Failed to retrieve group details" });
       }
-    });
+    } catch (populateError) {
+      console.error("Error populating group chat:", populateError);
+      return res.status(500).json({ message: "Failed to retrieve group details: " + populateError.message });
+    }
 
-    res.status(201).json(populatedGroupChat);
+    // Notify members via socket
+    console.log("Notifying members about new group");
+    try {
+      membersList.forEach((memberId) => {
+        console.log("Notifying member:", memberId);
+        const socketId = getReceiverSocketId(memberId);
+        console.log("Socket ID for member:", socketId);
+        if (socketId) {
+          io.to(socketId).emit("newGroupChat", populatedGroupChat);
+        }
+      });
+    } catch (socketError) {
+      console.error("Error notifying members:", socketError);
+      // Continue even if socket notifications fail
+    }
+
+    // Return success response
+    console.log("Successfully created group chat");
+    return res.status(201).json(populatedGroupChat);
   } catch (error) {
-    console.log("Error in createGroupChat controller: ", error);
-    console.log("Error message: ", error.message);
-    console.log("Error stack: ", error.stack);
-    res.status(500).json({ message: "Internal server error: " + error.message });
+    console.error("Error in createGroupChat controller: ", error);
+    console.error("Error message: ", error.message);
+    console.error("Error stack: ", error.stack);
+    return res.status(500).json({ message: "Internal server error: " + error.message });
   }
 };
 
