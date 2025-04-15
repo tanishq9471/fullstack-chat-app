@@ -98,8 +98,10 @@ const SimpleGroupModal = ({ isOpen, onClose }) => {
   };
 
   // If modal is not open, don't render anything
-  if (!isOpen) return null;
-
+  if (!isOpen) 
+    {return null;}
+  else {
+    console.log("Rendering SimpleGroupModal");
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-base-100 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto">
@@ -238,6 +240,7 @@ const SimpleGroupModal = ({ isOpen, onClose }) => {
       </div>
     </div>
   );
+};
 };
 
 export default SimpleGroupModal;
