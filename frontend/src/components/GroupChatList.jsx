@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useGroupChatStore } from "../store/useGroupChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import { Loader, Users, Plus } from "lucide-react";
-import CreateGroupModal from "./CreateGroupModal";
+import NewCreateGroupModal from "./NewCreateGroupModal";
 
 const GroupChatList = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -10,11 +10,18 @@ const GroupChatList = () => {
   const { onlineUsers } = useAuthStore();
 
   useEffect(() => {
+    console.log("GroupChatList mounted, fetching group chats");
     getGroupChats();
   }, [getGroupChats]);
 
   const handleGroupSelect = (group) => {
+    console.log("Group selected:", group);
     setSelectedGroup(group);
+  };
+  
+  const handleOpenCreateModal = () => {
+    console.log("Opening create group modal");
+    setIsCreateModalOpen(true);
   };
 
   return (
@@ -25,7 +32,7 @@ const GroupChatList = () => {
         </h3>
         <button
           className="btn btn-ghost btn-sm"
-          onClick={() => setIsCreateModalOpen(true)}
+          onClick={handleOpenCreateModal}
         >
           <Plus size={18} />
         </button>
@@ -40,7 +47,7 @@ const GroupChatList = () => {
           <p>No group chats yet</p>
           <button
             className="btn btn-ghost btn-sm mt-1"
-            onClick={() => setIsCreateModalOpen(true)}
+            onClick={handleOpenCreateModal}
           >
             Create a group
           </button>
@@ -105,9 +112,12 @@ const GroupChatList = () => {
         </div>
       )}
 
-      <CreateGroupModal
+      <NewCreateGroupModal
         isOpen={isCreateModalOpen}
-        onClose={() => setIsCreateModalOpen(false)}
+        onClose={() => {
+          console.log("Closing create group modal");
+          setIsCreateModalOpen(false);
+        }}
       />
     </div>
   );

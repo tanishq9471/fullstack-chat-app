@@ -20,9 +20,12 @@ const Sidebar = () => {
   
   // When switching tabs, reset selections
   useEffect(() => {
+    console.log("Tab changed to:", activeTab);
     if (activeTab === "direct") {
+      console.log("Resetting selected group");
       setSelectedGroup(null);
     } else {
+      console.log("Resetting selected user");
       setSelectedUser(null);
     }
   }, [activeTab, setSelectedGroup, setSelectedUser]);
@@ -40,7 +43,10 @@ const Sidebar = () => {
         <button
           className={`flex-1 py-3 flex flex-col items-center lg:flex-row lg:justify-center gap-2 
             ${activeTab === "direct" ? "border-b-2 border-primary" : ""}`}
-          onClick={() => setActiveTab("direct")}
+          onClick={() => {
+            console.log("Switching to Direct Messages tab");
+            setActiveTab("direct");
+          }}
         >
           <MessageSquare size={20} />
           <span className="text-xs lg:text-sm">Direct Messages</span>
@@ -48,7 +54,10 @@ const Sidebar = () => {
         <button
           className={`flex-1 py-3 flex flex-col items-center lg:flex-row lg:justify-center gap-2
             ${activeTab === "groups" ? "border-b-2 border-primary" : ""}`}
-          onClick={() => setActiveTab("groups")}
+          onClick={() => {
+            console.log("Switching to Group Chats tab");
+            setActiveTab("groups");
+          }}
         >
           <Users size={20} />
           <span className="text-xs lg:text-sm">Group Chats</span>

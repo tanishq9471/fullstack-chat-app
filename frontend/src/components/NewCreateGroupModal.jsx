@@ -4,7 +4,7 @@ import { useChatStore } from "../store/useChatStore";
 import { X, Loader, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 
-const CreateGroupModal = ({ isOpen, onClose }) => {
+const NewCreateGroupModal = ({ isOpen, onClose }) => {
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedMembers, setSelectedMembers] = useState([]);
@@ -16,6 +16,7 @@ const CreateGroupModal = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
+      console.log("Modal opened, fetching users");
       getUsers();
     }
   }, [isOpen, getUsers]);
@@ -89,9 +90,12 @@ const CreateGroupModal = ({ isOpen, onClose }) => {
     setPreviewImage("");
   };
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    console.log("Modal is not open, returning null");
+    return null;
+  }
 
-  console.log("CreateGroupModal is open:", isOpen);
+  console.log("Rendering modal, isOpen:", isOpen);
   console.log("Users available:", users);
 
   return (
@@ -234,4 +238,4 @@ const CreateGroupModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default CreateGroupModal;
+export default NewCreateGroupModal;
