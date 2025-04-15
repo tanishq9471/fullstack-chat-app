@@ -160,5 +160,6 @@ const generateAIResponse = async (userMessage) => {
   });
   
   // Return a random response
+  console.log(response.data.choices[0].message.content);
   return response.data?.choices[0]?.message?.content;
 };
