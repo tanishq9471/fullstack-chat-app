@@ -153,12 +153,12 @@ const generateAIResponse = async (userMessage) => {
 
   await axios.request(config)
   .then((response) => {
-    console.log(response.data);
+    console.log(JSON.stringify(response.data));
   })
   .catch((error) => {
     console.log(error);
   });
   
   // Return a random response
-  return response.data.choices[0].message.content;
+  return response.data?.choices[0]?.message?.content;
 };
