@@ -98,7 +98,7 @@ const SimpleGroupModal = ({ isOpen, onClose }) => {
   };
 
   // If modal is not open, don't render anything
-  if (!isOpen) 
+  if (isOpen) 
     {return null;}
   else {
     console.log("Rendering SimpleGroupModal");
