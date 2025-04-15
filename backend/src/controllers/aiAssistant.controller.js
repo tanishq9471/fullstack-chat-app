@@ -2,6 +2,9 @@ import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import { io } from "../lib/socket.js";
 import { response } from "express";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 // Create or get the AI assistant user
 export const getOrCreateAIAssistant = async () => {
@@ -142,7 +145,7 @@ const generateAIResponse = async (userMessage) => {
     url: 'https://api.netmind.ai/inference-api/openai/v1/chat/completions',
     headers: { 
       'Content-Type': 'application/json', 
-      'Authorization': 'Bearer 80733390ad3c49e1a9bdfae5ea3ed328'
+      'Authorization': `Bearer ${process.env.CHAT_GPT_KEY}`
     },
     data : data
   };
