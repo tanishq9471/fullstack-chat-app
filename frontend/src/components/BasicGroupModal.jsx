@@ -1,53 +1,25 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useGroupChatStore } from "../store/useGroupChatStore";
 import { useChatStore } from "../store/useChatStore";
 import { X, Loader, Upload } from "lucide-react";
 import toast from "react-hot-toast";
 
-const FixedCreateGroupModal = ({ isOpen, onClose }) => {
+const BasicGroupModal = ({ isOpen, onClose }) => {
   const [groupName, setGroupName] = useState("");
   const [description, setDescription] = useState("");
   const [selectedMembers, setSelectedMembers] = useState([]);
   const [groupImage, setGroupImage] = useState(null);
   const [previewImage, setPreviewImage] = useState("");
-  const [localIsOpen, setLocalIsOpen] = useState(false);
-  const modalRef = useRef(null);
-
+  
   const { createGroupChat, isCreatingGroup } = useGroupChatStore();
   const { users, getUsers, isUsersLoading } = useChatStore();
 
-  // Sync the local state with the prop
   useEffect(() => {
     if (isOpen) {
-      setLocalIsOpen(true);
-      console.log("Modal opened, fetching users");
+      console.log("Modal is open, fetching users");
       getUsers();
     }
   }, [isOpen, getUsers]);
-
-  // Handle clicks outside the modal to close it
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (localIsOpen && modalRef.current && !modalRef.current.contains(event.target)) {
-        handleClose();
-      }
-    };
-
-    if (localIsOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [localIsOpen]);
-
-  const handleClose = () => {
-    console.log("Closing modal");
-    setLocalIsOpen(false);
-    resetForm();
-    onClose();
-  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -62,11 +34,13 @@ const FixedCreateGroupModal = ({ isOpen, onClose }) => {
   };
 
   const toggleMemberSelection = (userId) => {
-    if (selectedMembers.includes(userId)) {
-      setSelectedMembers(selectedMembers.filter((id) => id !== userId));
-    } else {
-      setSelectedMembers([...selectedMembers, userId]);
-    }
+    setSelectedMembers(prev => {
+      if (prev.includes(userId)) {
+        return prev.filter(id => id !== userId);
+      } else {
+        return [...prev, userId];
+      }
+    });
   };
 
   const handleSubmit = async (e) => {
@@ -83,29 +57,28 @@ const FixedCreateGroupModal = ({ isOpen, onClose }) => {
     }
     
     try {
-      console.log("Creating group with members:", selectedMembers);
-      
-      const groupData = {
+      console.log("Creating group with data:", {
         name: groupName,
         members: selectedMembers,
         description,
-        groupImage,
-      };
+        groupImage: groupImage ? "Image data present (not shown)" : null
+      });
       
-      console.log("Submitting group data:", groupData);
+      const result = await createGroupChat({
+        name: groupName,
+        members: selectedMembers,
+        description,
+        groupImage
+      });
       
-      const newGroup = await createGroupChat(groupData);
-      console.log("Response from createGroupChat:", newGroup);
-      
-      if (newGroup) {
+      if (result) {
         toast.success("Group created successfully!");
-        handleClose();
-      } else {
-        toast.error("Failed to create group. Please try again.");
+        resetForm();
+        onClose();
       }
     } catch (error) {
-      console.error("Error creating group:", error);
-      toast.error("An error occurred while creating the group: " + (error.message || "Unknown error"));
+      console.error("Error in group creation:", error);
+      toast.error("Failed to create group");
     }
   };
 
@@ -117,42 +90,30 @@ const FixedCreateGroupModal = ({ isOpen, onClose }) => {
     setPreviewImage("");
   };
 
-  if (!localIsOpen) {
-    return null;
-  }
-
-  console.log("Rendering modal content, users:", users);
+  if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div 
-        ref={modalRef}
-        className="bg-base-100 rounded-lg w-full max-w-md max-h-[90vh] overflow-y-auto"
-      >
-        <div className="p-4 border-b flex justify-between items-center">
-          <h2 className="text-xl font-semibold">Create New Group</h2>
-          <button 
-            onClick={handleClose} 
-            className="btn btn-ghost btn-sm"
-          >
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+      <div className="bg-base-100 rounded-lg w-full max-w-md max-h-[90vh] overflow-auto">
+        <div className="p-4 border-b border-base-300 flex justify-between items-center">
+          <h2 className="text-xl font-bold">Create New Group</h2>
+          <button onClick={onClose} className="btn btn-ghost btn-sm">
             <X size={20} />
           </button>
         </div>
-
+        
         <form onSubmit={handleSubmit} className="p-4 space-y-4">
           {/* Group Image */}
           <div className="flex flex-col items-center mb-4">
-            <div className="avatar mb-2">
-              <div className="w-24 h-24 rounded-full border-2 border-primary flex items-center justify-center overflow-hidden">
-                {previewImage ? (
-                  <img src={previewImage} alt="Group" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="text-center text-gray-400">
-                    <Upload size={32} className="mx-auto" />
-                    <span className="text-xs">Group Image</span>
-                  </div>
-                )}
-              </div>
+            <div className="w-24 h-24 rounded-full border-2 border-primary flex items-center justify-center overflow-hidden mb-2">
+              {previewImage ? (
+                <img src={previewImage} alt="Group" className="w-full h-full object-cover" />
+              ) : (
+                <div className="text-center text-gray-400">
+                  <Upload size={32} className="mx-auto" />
+                  <span className="text-xs">Group Image</span>
+                </div>
+              )}
             </div>
             <label className="btn btn-sm btn-outline">
               Upload Image
@@ -228,7 +189,7 @@ const FixedCreateGroupModal = ({ isOpen, onClose }) => {
                           type="checkbox"
                           className="checkbox checkbox-primary"
                           checked={selectedMembers.includes(user._id)}
-                          onChange={() => {}}
+                          readOnly
                         />
                       </div>
                     </div>
@@ -242,7 +203,10 @@ const FixedCreateGroupModal = ({ isOpen, onClose }) => {
             <button
               type="button"
               className="btn btn-ghost"
-              onClick={handleClose}
+              onClick={() => {
+                resetForm();
+                onClose();
+              }}
             >
               Cancel
             </button>
@@ -260,4 +224,4 @@ const FixedCreateGroupModal = ({ isOpen, onClose }) => {
   );
 };
 
-export default FixedCreateGroupModal;
+export default BasicGroupModal;

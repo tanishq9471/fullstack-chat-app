@@ -14,7 +14,7 @@ passport.use(
       clientSecret: process.env.GOOGLE_CLIENT_SECRET,
       callbackURL: process.env.NODE_ENV === 'production' 
         ? 'https://real-time-chat-gsr4.onrender.com/api/auth/google/callback'
-        : 'http://localhost:5000/api/auth/google/callback',
+        : 'http://localhost:5001/api/auth/google/callback',
     },
     async (accessToken, refreshToken, profile, done) => {
       try {

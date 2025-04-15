@@ -5,6 +5,7 @@ import Sidebar from "../components/Sidebar";
 import NoChatSelected from "../components/NoChatSelected";
 import ChatContainer from "../components/ChatContainer";
 import GroupChatContainer from "../components/GroupChatContainer";
+import CreateGroupButton from "../components/CreateGroupButton";
 
 const HomePage = () => {
   const { selectedUser } = useChatStore();
@@ -27,6 +28,9 @@ const HomePage = () => {
           </div>
         </div>
       </div>
+      
+      {/* Floating button to create a new group */}
+      <CreateGroupButton />
     </div>
   );
 };
