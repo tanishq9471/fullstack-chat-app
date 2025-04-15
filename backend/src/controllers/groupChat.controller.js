@@ -2,7 +2,7 @@ import GroupChat from "../models/groupChat.model.js";
 import Message from "../models/message.model.js";
 import User from "../models/user.model.js";
 import cloudinary from "../lib/cloudinary.js";
-import { io } from "../lib/socket.js";
+import { io, getReceiverSocketId } from "../lib/socket.js";
 
 // Create a new group chat
 export const createGroupChat = async (req, res) => {
@@ -373,5 +373,4 @@ export const sendGroupMessage = async (req, res) => {
   }
 };
 
-// Import the getReceiverSocketId function
-import { getReceiverSocketId } from "../lib/socket.js";
+// getReceiverSocketId is now imported at the top of the file
