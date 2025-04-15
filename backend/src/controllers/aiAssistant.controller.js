@@ -127,15 +127,9 @@ const generateAIResponse = async (userMessage) => {
         "role": "user",
         "content": [
           {
-            "type": "text",
+            "type": userMessage,
             "text": "What is in the picture?"
-          },
-          {
-            "type": "image_url",
-            "image_url": {
-              "url": "https://github.com/sgl-project/sglang/blob/main/test/lang/example_image.png?raw=true"
-            }
-          }
+          }        
         ]
       }
     ],
