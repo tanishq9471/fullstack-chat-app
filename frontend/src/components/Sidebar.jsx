@@ -4,9 +4,9 @@ import { useGroupChatStore } from "../store/useGroupChatStore";
 import { useAuthStore } from "../store/useAuthStore";
 import SidebarSkeleton from "./skeletons/SidebarSkeleton";
 import GroupChatList from "./GroupChatList";
-import { Users, MessageSquare } from "lucide-react";
+import { Users, MessageSquare, Bot } from "lucide-react";
 
-const Sidebar = () => {
+const Sidebar = ({ showAIAssistant, setShowAIAssistant }) => {
   const { getUsers, users, selectedUser, setSelectedUser, isUsersLoading } = useChatStore();
   const { selectedGroup, setSelectedGroup } = useGroupChatStore();
 
@@ -86,10 +86,46 @@ const Sidebar = () => {
           </div>
 
           <div className="overflow-y-auto w-full py-2">
+            {/* AI Assistant Button */}
+            <button
+              onClick={() => {
+                setSelectedUser(null);
+                setSelectedGroup(null);
+                setShowAIAssistant(true);
+              }}
+              className={`
+                w-full p-3 flex items-center gap-3
+                hover:bg-base-300 transition-colors
+                ${showAIAssistant ? "bg-base-300 ring-1 ring-base-300" : ""}
+              `}
+            >
+              <div className="relative mx-auto lg:mx-0">
+                <div className="size-12 flex items-center justify-center bg-gradient-to-r from-blue-500 to-purple-600 rounded-full">
+                  <Bot size={24} className="text-white" />
+                </div>
+                <span
+                  className="absolute bottom-0 right-0 size-3 bg-green-500 
+                  rounded-full ring-2 ring-zinc-900"
+                />
+              </div>
+
+              {/* AI Assistant info - only visible on larger screens */}
+              <div className="hidden lg:block text-left min-w-0">
+                <div className="font-medium truncate">ChatGPT Assistant</div>
+                <div className="text-sm text-green-500">
+                  Always Online
+                </div>
+              </div>
+            </button>
+
+            {/* Regular Users */}
             {filteredUsers.map((user) => (
               <button
                 key={user._id}
-                onClick={() => setSelectedUser(user)}
+                onClick={() => {
+                  setSelectedUser(user);
+                  setShowAIAssistant(false);
+                }}
                 className={`
                   w-full p-3 flex items-center gap-3
                   hover:bg-base-300 transition-colors
@@ -120,7 +156,7 @@ const Sidebar = () => {
               </button>
             ))}
 
-            {filteredUsers.length === 0 && (
+            {filteredUsers.length === 0 && !showAIAssistant && (
               <div className="text-center text-gray-500 py-4">No users found</div>
             )}
           </div>
