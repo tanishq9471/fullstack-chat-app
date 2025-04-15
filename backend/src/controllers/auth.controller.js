@@ -2,6 +2,11 @@ import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
+import { sendLoginNotification, sendSignupConfirmation } from "../utils/emailService.js";
+import { getDeviceInfo, getClientIp, getCurrentTime } from "../utils/deviceInfo.js";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const googleAuth = async (req, res) => {
   try {
@@ -13,6 +18,7 @@ export const googleAuth = async (req, res) => {
 
     // Check if user already exists by email or googleId
     let user = await User.findOne({ $or: [{ email }, { googleId }] });
+    let isNewUser = false;
     
     if (user) {
       // If user exists but doesn't have googleId (registered via email), update the googleId
@@ -23,6 +29,29 @@ export const googleAuth = async (req, res) => {
       
       // User exists, log them in
       generateToken(user._id, res);
+      
+      // Send login notification email if enabled
+      if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
+        try {
+          const userAgent = req.headers['user-agent'];
+          const { device, browser } = getDeviceInfo(userAgent);
+          const ip = getClientIp(req);
+          const time = getCurrentTime();
+
+          // Send login notification asynchronously (don't wait for it)
+          sendLoginNotification(user.email, user.fullName, {
+            ip,
+            device,
+            browser,
+            time
+          }).catch(err => console.error('Failed to send Google login email:', err));
+          
+          console.log(`Google login notification email queued for ${user.email}`);
+        } catch (emailError) {
+          // Don't fail the login if email sending fails
+          console.error('Error preparing Google login notification email:', emailError);
+        }
+      }
       
       return res.status(200).json({
         _id: user._id,
@@ -43,6 +72,30 @@ export const googleAuth = async (req, res) => {
     
     await newUser.save();
     generateToken(newUser._id, res);
+    isNewUser = true;
+    
+    // Send signup confirmation email if enabled
+    if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
+      try {
+        const userAgent = req.headers['user-agent'];
+        const { device, browser } = getDeviceInfo(userAgent);
+        const ip = getClientIp(req);
+        const time = getCurrentTime();
+
+        // Send signup confirmation asynchronously (don't wait for it)
+        sendSignupConfirmation(newUser.email, newUser.fullName, {
+          ip,
+          device,
+          browser,
+          time
+        }).catch(err => console.error('Failed to send Google signup email:', err));
+        
+        console.log(`Google signup confirmation email queued for ${newUser.email}`);
+      } catch (emailError) {
+        // Don't fail the signup if email sending fails
+        console.error('Error preparing Google signup confirmation email:', emailError);
+      }
+    }
     
     res.status(201).json({
       _id: newUser._id,
@@ -86,6 +139,29 @@ export const signup = async (req, res) => {
       generateToken(newUser._id, res);
       await newUser.save();
 
+      // Send signup confirmation email if enabled
+      if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
+        try {
+          const userAgent = req.headers['user-agent'];
+          const { device, browser } = getDeviceInfo(userAgent);
+          const ip = getClientIp(req);
+          const time = getCurrentTime();
+
+          // Send signup confirmation asynchronously (don't wait for it)
+          sendSignupConfirmation(newUser.email, newUser.fullName, {
+            ip,
+            device,
+            browser,
+            time
+          }).catch(err => console.error('Failed to send signup email:', err));
+          
+          console.log(`Signup confirmation email queued for ${newUser.email}`);
+        } catch (emailError) {
+          // Don't fail the signup if email sending fails
+          console.error('Error preparing signup confirmation email:', emailError);
+        }
+      }
+
       res.status(201).json({
         _id: newUser._id,
         fullName: newUser.fullName,
@@ -116,6 +192,29 @@ export const login = async (req, res) => {
     }
 
     generateToken(user._id, res);
+
+    // Send login notification email if enabled
+    if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
+      try {
+        const userAgent = req.headers['user-agent'];
+        const { device, browser } = getDeviceInfo(userAgent);
+        const ip = getClientIp(req);
+        const time = getCurrentTime();
+
+        // Send login notification asynchronously (don't wait for it)
+        sendLoginNotification(user.email, user.fullName, {
+          ip,
+          device,
+          browser,
+          time
+        }).catch(err => console.error('Failed to send login email:', err));
+        
+        console.log(`Login notification email queued for ${user.email}`);
+      } catch (emailError) {
+        // Don't fail the login if email sending fails
+        console.error('Error preparing login notification email:', emailError);
+      }
+    }
 
     res.status(200).json({
       _id: user._id,

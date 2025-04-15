@@ -3,6 +3,7 @@ import { Strategy as GoogleStrategy } from 'passport-google-oauth20';
 import dotenv from 'dotenv';
 import User from '../models/user.model.js';
 import { generateToken } from '../lib/utils.js';
+import { sendLoginNotification, sendSignupConfirmation } from '../utils/emailService.js';
 
 dotenv.config(); // Load environment variables
 
@@ -21,6 +22,27 @@ passport.use(
         let user = await User.findOne({ googleId: profile.id });
         
         if (user) {
+          // Send login notification if enabled
+          if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
+            try {
+              // We don't have req object here, so we'll use generic info
+              const loginInfo = {
+                ip: 'OAuth login',
+                device: 'Unknown (OAuth)',
+                browser: 'Unknown (OAuth)',
+                time: new Date().toLocaleString()
+              };
+              
+              // Send login notification asynchronously
+              sendLoginNotification(user.email, user.fullName, loginInfo)
+                .catch(err => console.error('Failed to send OAuth login email:', err));
+              
+              console.log(`OAuth login notification email queued for ${user.email}`);
+            } catch (emailError) {
+              console.error('Error preparing OAuth login notification email:', emailError);
+            }
+          }
+          
           return done(null, user);
         }
         
@@ -33,6 +55,28 @@ passport.use(
             // Update existing user with Google ID
             user.googleId = profile.id;
             await user.save();
+            
+            // Send login notification if enabled
+            if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true') {
+              try {
+                // We don't have req object here, so we'll use generic info
+                const loginInfo = {
+                  ip: 'OAuth login',
+                  device: 'Unknown (OAuth)',
+                  browser: 'Unknown (OAuth)',
+                  time: new Date().toLocaleString()
+                };
+                
+                // Send login notification asynchronously
+                sendLoginNotification(user.email, user.fullName, loginInfo)
+                  .catch(err => console.error('Failed to send OAuth login email:', err));
+                
+                console.log(`OAuth login notification email queued for ${user.email}`);
+              } catch (emailError) {
+                console.error('Error preparing OAuth login notification email:', emailError);
+              }
+            }
+            
             return done(null, user);
           }
         }
@@ -46,6 +90,28 @@ passport.use(
         });
         
         await newUser.save();
+        
+        // Send signup confirmation if enabled
+        if (process.env.SEND_EMAIL_NOTIFICATIONS === 'true' && newUser.email) {
+          try {
+            // We don't have req object here, so we'll use generic info
+            const signupInfo = {
+              ip: 'OAuth signup',
+              device: 'Unknown (OAuth)',
+              browser: 'Unknown (OAuth)',
+              time: new Date().toLocaleString()
+            };
+            
+            // Send signup confirmation asynchronously
+            sendSignupConfirmation(newUser.email, newUser.fullName, signupInfo)
+              .catch(err => console.error('Failed to send OAuth signup email:', err));
+            
+            console.log(`OAuth signup confirmation email queued for ${newUser.email}`);
+          } catch (emailError) {
+            console.error('Error preparing OAuth signup confirmation email:', emailError);
+          }
+        }
+        
         return done(null, newUser);
       } catch (error) {
         return done(error, null);
