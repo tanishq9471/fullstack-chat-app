@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import { io } from "../lib/socket.js";
+import { response } from "express";
 
 // Create or get the AI assistant user
 export const getOrCreateAIAssistant = async () => {
@@ -105,22 +106,61 @@ export const sendMessageToAIAssistant = async (req, res) => {
 // In a real implementation, this would call the OpenAI API
 const generateAIResponse = async (userMessage) => {
   // Simple response logic - in a real app, you would call OpenAI API here
-  const responses = [
-    "I'm here to help! What would you like to know?",
-    "That's an interesting question. Let me think about it...",
-    "I understand your question. Here's what I think...",
-    "Based on my knowledge, I would suggest...",
-    "I'm not sure about that, but here's my best guess...",
-    `I've processed your message: "${userMessage}". Here's my response...`,
-    "Thanks for asking! Here's what I can tell you...",
-    "Let me provide some information on that topic...",
-    "I'm happy to assist with your question about that.",
-    "I've analyzed your question and here's what I found..."
-  ];
+  // const responses = [
+  //   "I'm here to help! What would you like to know?",
+  //   "That's an interesting question. Let me think about it...",
+  //   "I understand your question. Here's what I think...",
+  //   "Based on my knowledge, I would suggest...",
+  //   "I'm not sure about that, but here's my best guess...",
+  //   `I've processed your message: "${userMessage}". Here's my response...`,
+  //   "Thanks for asking! Here's what I can tell you...",
+  //   "Let me provide some information on that topic...",
+  //   "I'm happy to assist with your question about that.",
+  //   "I've analyzed your question and here's what I found..."
+  // ];
   
-  // Simulate a delay to make it feel more natural
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  const axios = require('axios');
+  let data = JSON.stringify({
+    "model": "google/gemma-3-12b-it",
+    "messages": [
+      {
+        "role": "user",
+        "content": [
+          {
+            "type": "text",
+            "text": "What is in the picture?"
+          },
+          {
+            "type": "image_url",
+            "image_url": {
+              "url": "https://github.com/sgl-project/sglang/blob/main/test/lang/example_image.png?raw=true"
+            }
+          }
+        ]
+      }
+    ],
+    "max_tokens": 512
+  });
+
+  let config = {
+    method: 'post',
+    maxBodyLength: Infinity,
+    url: 'https://api.netmind.ai/inference-api/openai/v1/chat/completions',
+    headers: { 
+      'Content-Type': 'application/json', 
+      'Authorization': 'Bearer 80733390ad3c49e1a9bdfae5ea3ed328'
+    },
+    data : data
+  };
+
+  await axios.request(config)
+  .then((response) => {
+    console.log(JSON.stringify(response.data));
+  })
+  .catch((error) => {
+    console.log(error);
+  });
   
   // Return a random response
-  return responses[Math.floor(Math.random() * responses.length)];
+  return response.data.choices[0].message.content;
 };
